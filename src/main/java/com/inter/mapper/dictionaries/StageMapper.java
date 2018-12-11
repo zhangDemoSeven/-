@@ -27,4 +27,6 @@ public interface StageMapper {
 
 	Stage getStageByBooksId(@Param("booksId")Integer booksId);
 
+	//查询stage表中status为1的所有字段
+	List<Stage> getAllStages();
 }

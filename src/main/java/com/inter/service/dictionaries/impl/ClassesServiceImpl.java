@@ -223,5 +223,12 @@ public class ClassesServiceImpl extends BaseService implements ClassesService {
 			return createMessageMap(5000, "班级不在同一阶段,请重新选择");
 		}
 	}
+
+	//根据阶段ID查询班级
+	@Override
+	public List<Classes> getClassesByStage(Integer id) throws CustomException {
+		if (id == null || id == 0) throw new CustomException("传参异常");
+		return classesMapper.getClassesByStage(id);
+	}
 	
 }

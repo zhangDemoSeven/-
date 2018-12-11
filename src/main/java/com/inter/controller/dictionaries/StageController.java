@@ -75,4 +75,19 @@ return stageService.optStage(id);
 		checkPermissionToView("DICTIONARIES_STAGE");
 return stageService.delStage(id);
 	}
+	
+	
+	/**
+	 * @throws CustomException 
+	 * @Title: getAllStages
+	 * @Description: TODO
+	 * @param @return    参数
+	 * @return Object    返回类型
+	 * @throws
+	 */
+	@RequestMapping("/getAllStages.do")
+	@ResponseBody
+	public Object getAllStages() throws CustomException {
+		return stageService.getAllStages();
+	}
 }

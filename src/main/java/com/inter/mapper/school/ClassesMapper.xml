@@ -13,7 +13,10 @@
   </sql>
   
   
-  
+  <!-- 根据阶段ID查询班级 -->
+  <select id="getClassesByStage" resultMap="BaseResultMap" parameterType="INTEGER">
+  		SELECT * FROM classes WHERE `stage_id` = #{stageId}
+  </select>
   
   <!-- 根据班级ID查询当前班级是否正在考试中 -->
   <select id="selectExaminationCount" parameterType="int" resultType="int">

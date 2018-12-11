@@ -30,5 +30,9 @@ public class ClassesController {
 		return classesService.getClassesListByS1();
 	}
 	
-	
+	@ResponseBody
+	@RequestMapping("/getClassesByStage.do")
+ 	public List<Classes> getClassesByStage(Integer id) throws CustomException {
+		return classesService.getClassesByStage(id);
+ 	}
 }

@@ -7,30 +7,28 @@
 		<%@include file="/header/header.jsp"%>
 	</head>
 	<title>月度考试</title>
-<body>
+	<body>
 		<div class="layui-form">  
             <div class="layui-input-inline">  
-                <select name="stage" lay-filter="stage" class="province">  
-                    <option>请选择阶段</option>  
+                <select name="stage" id="stage" lay-filter="stage">  
+                    <option value="">请选择阶段</option>
                 </select>  
             </div>  
             <div class="layui-input-inline">  
-                <select name="classes" lay-filter="classes" disabled>  
+                <select name="classes" id="classes" lay-filter="classes" disabled>  
                     <option>请选择参考班级</option>  
                 </select>  
             </div>  
             <div class="layui-input-inline">  
-                <select name="status" lay-filter="status" disabled>  
+                <select name="status" id="status" lay-filter="status" disabled>  
                     <option>请选择试卷状态</option>  
                 </select>  
             </div>  
             <div class="layui-input-inline">  
-                <select name="paperName" lay-filter="paperName" disabled>  
-                    <option>请选择试卷名称</option>  
-                </select>  
+                <input type="text" class="layui-input" name="paperName" id="paperName" lay-filter="paperName" placeholder="请输入试卷名称" readonly="readonly"/>
             </div>  
             <div class="layui-input-inline"> 
-                <input type="text" class="layui-input" id="createTime" placeholder="请选择时间" >
+                <input type="text" class="layui-input" id="createTime" placeholder="请选择时间"/>
             </div>
         </div>  
         <div style="margin-left: 10px;margin-top: 10px;">
@@ -45,14 +43,90 @@
 		    <button class="layui-btn layui-btn-normal" onclick="seeScore()">查看成绩</button>
 		    <button class="layui-btn layui-btn-warm" onclick="seeRank()">查看排名</button>
 		</div>  
-        <table id="examList" class="layui-hide"></table>
+        <table id="examList" class="layui-hide" lay-filter="examList"></table>
 	<script type="text/javascript">
-		layui.use(['layer', 'table', 'laydate'], function() {
+		$(function() {
+			//三级联动模块
+			$.ajax({
+				type : "GET",
+				url : "${pageContext.request.contextPath}/stage/getAllStages.do",
+				dataType : "JSON",
+				success: function(data) {
+					$.each(data,function(i,v){
+						i = i+1;
+						$option = $("<option value='"+i+"'>"+v.name+"</option>");
+						$("#stage").append($option);
+					});
+					
+				}
+			});
+		});
+		
+		layui.use(['layer', 'table', 'laydate', 'form'], function() {
 			var layer = layer
 			,table = layui.table
-			,laydate = layui.laydate;
+			,laydate = layui.laydate
+			,form = layui.form;
 			
-			//日期渲染
+			//layui下拉框监听事件
+			form.on('select(stage)', function(data){
+				//判断是否选择，如果选择去去除下一个的锁定状态
+				if (data.value != "") {
+					$("#classes").html("");
+					$("#classes").removeAttr("disabled");	//去除锁定状态
+					var id = $("#stage option:selected").val();
+					alert(id);
+					$.ajax({
+						type : "GET",
+						url : "${pageContext.request.contextPath}/classes/getClassesByStage.do",
+						data : {"id" : id},
+						dataType : "JSON",
+						async : false,	//同步,否则无法渲染
+						success: function(data) {
+							$.each(data,function(i,v){
+								i = i+1;
+								$option = $("<option value='"+i+"'>"+v.className+"</option>");
+								$("#classes").append($option);
+							});
+						}
+					});
+				}
+				form.render('select'); //重新渲染select框，这个必须要加，否则不起作用
+			});
+			
+			form.on('select(classes)', function(data){
+				$("#status").html("");
+				//判断是否选择，如果选择去去除下一个的锁定状态
+				if (data.value != "") {
+					$("#status").removeAttr("disabled");	//去除锁定状态
+					var id = $("#classes option:selected").val();
+					alert(id);
+					$.ajax({
+						type : "GET",
+						url : "${pageContext.request.contextPath}/classes/getClassesByStage.do",
+						data : {"id" : id},
+						dataType : "JSON",
+						async : false,	//同步,否则无法渲染
+						success: function(data) {
+							$.each(data,function(i,v){
+								i = i+1;
+								$option = $("<option value='"+i+"'>"+v.className+"</option>");
+								$("#status").append($option);
+							});
+						}
+					});
+				}
+				form.render('select'); //重新渲染select框，这个必须要加，否则不起作用
+			});
+			form.on('select(status)', function(data){
+				$("#paperName").text("");
+				//判断是否选择，如果选择去去除下一个的锁定状态
+				if (data.value != "") {
+					$("#paperName").removeAttr("readonly");	//去除只读状态
+				}
+				form.render('select'); //重新渲染select框，这个必须要加，否则不起作用
+			});
+			
 			//日期时间选择器
 			laydate.render({
 			    elem: '#createTime'
@@ -320,19 +394,8 @@
 					{field: 'classesIds',title: '参考班级',align: "center",
 						templet: function(d){
 							var arr=new Array();
-							arr = d.classesIds.split(',');	//以逗号分隔字符串
-							for (var i = 0; i < arr.length; i++) {
-								 arr = arr[i];
-								 $.ajax({
-										url: '${pageContext.request.contextPath}/exam/getClasses',
-										type: "GET",
-										dataType: "JSON",
-										data: {"id": arr},
-										success: function(data) {
-											return data.class_name;
-										}
-								 });
-							}
+							 arr = d.classesIds.split(',');	//以逗号分隔字符串
+							 return "S2T" + arr + "班";		//此处不知道
 						}		
 					},
 					{field: 'startTime',title: '开始时间',align: "center"},
@@ -356,6 +419,7 @@
 				]]
 		        ,page: true		//开启分页
 			});
+			
 		});
 		
 		
@@ -368,12 +432,6 @@
 				  }
 			}); 
 		}
-<<<<<<< HEAD
-=======
-		
-		
-		
->>>>>>> branch 'master' of https://github.com/SunJiaWei123/-.git
 	</script>
-</body>
+	</body>
 </html>

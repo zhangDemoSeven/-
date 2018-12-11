@@ -24,6 +24,11 @@
 	and s.prohibition = '1'
   </select>
   
+  <!-- 查询stage表中status为1的所有字段 -->
+  <select id="getAllStages" resultMap="BaseResultMap">
+  	SELECT * FROM stage WHERE `status` = 1
+  </select>
+  
   <select id="getStageListByNoPage" resultMap="BaseResultMap">
   	select 
   		<include refid="Base_Column_List" />

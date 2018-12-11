@@ -28,6 +28,7 @@ public class ExamServiceImpl extends BaseService implements ExamService {
 		System.err.println(exams);
 		return new PageInfo<Exam>(exams);
 	}
+	//根据考试表中的数组查询对应的班级
 
 	
 }

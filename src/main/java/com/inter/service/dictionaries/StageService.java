@@ -21,4 +21,6 @@ public interface StageService {
 
 	List<Stage> getStageListByNoPage()throws CustomException;
 
+	//查询stage表中status为1的所有字段
+	List<Stage> getAllStages() throws CustomException;
 }

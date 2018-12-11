@@ -36,4 +36,7 @@ public interface ClassesMapper {
 	List<Classes> getClassesListByTeacherIdAndExamId(@Param("teacherId")Integer id,@Param("examId") Integer examId);
 
 	int selectExaminationCount(Integer classesId);
+	
+	//根据阶段ID查询班级
+	List<Classes> getClassesByStage(Integer id);
 }

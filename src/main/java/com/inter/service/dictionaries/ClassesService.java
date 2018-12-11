@@ -21,4 +21,6 @@ public interface ClassesService {
 
 	Map<String, Object> checkClassesNameById(String classesIds)throws CustomException;
 
+	//根据阶段ID查询班级
+	List<Classes> getClassesByStage(Integer id) throws CustomException;
 }

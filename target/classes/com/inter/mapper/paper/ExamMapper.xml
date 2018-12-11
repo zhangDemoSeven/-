@@ -38,4 +38,13 @@
 	<select id="getAllExams" resultMap="baseResultMap">
 		select * from exam
 	</select>
+	
+	<!-- 根据考试表中的数组查询对应的班级 -->
+	<select id="getClasses" resultType="com.inter.pojo.school.Classes" parameterType="INTEGER">
+		SELECT `class_name` FROM classes   
+		<where>
+			`id` = #{id}
+			<if test=""></if>
+		</where>
+	</select>
 </mapper>

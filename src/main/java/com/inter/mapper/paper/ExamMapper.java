@@ -14,4 +14,6 @@ public interface ExamMapper {
 
 	//获取所有考试信息
 	List<Exam> getAllExams();
+	
+	//根据考试表中的数组查询对应的班级
 }

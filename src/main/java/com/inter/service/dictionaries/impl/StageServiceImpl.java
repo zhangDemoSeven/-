@@ -122,4 +122,9 @@ public class StageServiceImpl extends BaseService implements StageService {
 	public List<Stage> getStageListByNoPage() throws CustomException {
 		return stageMapper.getStageListByNoPage();
 	}
+
+	@Override
+	public List<Stage> getAllStages() throws CustomException {
+		return stageMapper.getAllStages();
+	}
 }
