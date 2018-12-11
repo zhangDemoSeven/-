@@ -81,7 +81,6 @@
 					{field: 'showeye',title: '查看答案',align: "center"},
 					{field: 'status',title: '考试状态',align: "center"},
 					{field: 'types',title: '考卷类型',align: 'center'}
-					{field: sadasdsa}
 				]]
 		        ,page: true		//开启分页
 			});
