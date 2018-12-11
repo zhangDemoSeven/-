@@ -332,7 +332,7 @@
 							if (d.status == 1 || d.status == '1') return "<font color='red'><b>未开考</b></font>";
 							if (d.status == 2 || d.status == '2') return "<font color='green'><b>进行中</b></font>";
 							if (d.status == 3 || d.status == '3') return "<font color='yellow'><b>批改中</b></font>";
-							if (d.status == 3 || d.status == '4') return "<font color='gray'><b>已结束</b></font>";
+							if (d.status == 4 || d.status == '4') return "<font color='gray'><b>已结束</b></font>";
 						}
 					},
 				]]
