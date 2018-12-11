@@ -34,16 +34,16 @@
             </div>
         </div>  
         <div style="margin-left: 10px;margin-top: 10px;">
-		    <button class="layui-btn">查询</button>
-		    <button class="layui-btn">发布试卷</button>
-		    <button class="layui-btn layui-btn-normal">查看试卷</button>
-		    <button class="layui-btn layui-btn-warm">开始考试</button>
-		    <button class="layui-btn layui-btn-danger">结束试卷</button>
+		    <button class="layui-btn" onclick="query()">查询</button>
+		    <button class="layui-btn" onclick="publishPaper()">发布试卷</button>
+		    <button class="layui-btn layui-btn-normal" onclick="seePaper()">查看试卷</button>
+		    <button class="layui-btn layui-btn-warm" onclick="startExam()">开始考试</button>
+		    <button class="layui-btn layui-btn-danger" onclick="endExam()">结束试卷</button>
 		    <!-- 合并 -->
 		    <button class="layui-btn layui-btn-normal" onclick="postil()">批注考试</button>
-		    <button class="layui-btn layui-btn-normal">试卷讲解</button>
-		    <button class="layui-btn layui-btn-normal">查看成绩</button>
-		    <button class="layui-btn layui-btn-warm">查看排名</button>
+		    <button class="layui-btn layui-btn-normal" onclick="tellPaper()">试卷讲解</button>
+		    <button class="layui-btn layui-btn-normal" onclick="seeScore()">查看成绩</button>
+		    <button class="layui-btn layui-btn-warm" onclick="seeRank()">查看排名</button>
 		</div>  
         <table id="examList" class="layui-hide"></table>
 	<script type="text/javascript">
