@@ -42,7 +42,7 @@
 		    <button class="layui-btn layui-btn-normal">批注考试</button>
 		    <button class="layui-btn layui-btn-normal">试卷讲解</button>
 		    <button class="layui-btn layui-btn-normal">查看成绩</button>
-		    <button class="layui-btn layui-btn-normal">查看排名</button>
+		    <button class="layui-btn layui-btn-warm">查看排名</button>
 		</div>  
         <table id="examList" class="layui-hide"></table>
 	<script type="text/javascript">
