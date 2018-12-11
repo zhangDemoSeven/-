@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.inter.mapper.lead.MessageMapper">
+  <resultMap id="BaseResultMap" type="com.inter.pojo.lead.Message">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="content" jdbcType="VARCHAR" property="content" />
+    <result column="source" jdbcType="VARCHAR" property="source" />
+    <result column="status" jdbcType="VARCHAR" property="status" />
+    <result column="target" jdbcType="VARCHAR" property="target"/>
+    <result column="create_user" jdbcType="VARCHAR" property="createUser" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, content,target, source, status, create_user, create_time
+  </sql>
+  
+  <!-- 查询所有的消息 -->
+  <select id="getAllMessage" resultMap="BaseResultMap">
+  	select <include refid="Base_Column_List" />,
+  	(select name from level where id = message.source) as sourceName
+  	from message
+  	where status=1
+  	ORDER BY create_time DESC
+  </select>
+  
+  <!-- 修改为删除状态 -->
+  <update id="updateStatusToZero" parameterType="int">
+  	update message set status = 0 where id = #{id}
+  </update>
+  
+  <!-- 获得总数 -->
+  <select id="getCount" resultType="int">
+  select count(0) from message where status=1
+  	<if test="messageName != null">
+  		 and content like CONCAT("%",#{messageName,jdbcType=VARCHAR},"%") 
+  	</if>
+  	<if test="startDate != null and endDate != null">
+  		and create_time between #{startDate} and #{endDate}
+  	</if>
+  </select>
+  
+  <!-- 分页数据 -->
+  <select id="getLimitData" parameterType="com.inter.pojo.lead.Message" resultMap="BaseResultMap">
+  	  	select <include refid="Base_Column_List" />,
+  	  	(select name from level where id = message.source) as sourceName
+	  	from message
+	  	where status = 1
+	  	<if test="messageName != null">
+  		 and content like CONCAT("%",#{messageName,jdbcType=VARCHAR},"%") 
+	  	</if>
+	  	<if test="startDate != null and endDate != null">
+	  		and create_time between #{startDate} and #{endDate}
+	  	</if>
+  		order by create_time desc
+  		limit #{offset},#{limit}
+  </select>
+  
+  
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from message
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from message
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+ 
+  <insert id="insertSelective" parameterType="com.inter.pojo.lead.Message">
+    insert into message
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="content != null">
+        content,
+      </if>
+      <if test="source != null">
+        source,
+      </if>
+      <if test="target != null">
+        target,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="createUser != null">
+        create_user,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="content != null">
+        #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="source != null">
+        #{source,jdbcType=VARCHAR},
+      </if>
+      <if test="target != null">
+        #{target,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="createUser != null">
+        #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.inter.pojo.lead.Message">
+    update message
+    <set>
+      <if test="content != null">
+        content = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="source != null">
+        source = #{source,jdbcType=VARCHAR},
+      </if>
+      <if test="target != null">
+        target  = #{target,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="createUser != null">
+        create_user = #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

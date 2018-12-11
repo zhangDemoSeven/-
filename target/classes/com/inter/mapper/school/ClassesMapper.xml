@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.inter.mapper.school.ClassesMapper">
+  <resultMap id="BaseResultMap" type="com.inter.pojo.school.Classes">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="class_name" jdbcType="VARCHAR" property="className" />
+    <result column="shift_time" jdbcType="DATE" property="shiftTime" />
+    <result column="stage_id" jdbcType="INTEGER" property="stageId" />
+    <result column="ison" jdbcType="INTEGER" property="ison" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, class_name, shift_time, stage_id, ison
+  </sql>
+  
+  
+  
+  
+  <!-- 根据班级ID查询当前班级是否正在考试中 -->
+  <select id="selectExaminationCount" parameterType="int" resultType="int">
+	SELECT  COUNT(0) FROM exam WHERE FIND_IN_SET( #{classesId} ,exam.`classes_ids`) AND exam.`status`!=4
+  </select>
+  
+  
+   <!-- 查询教师所管理，参与本次考试的班级集合 -->
+  <select id="getClassesListByTeacherIdAndExamId" resultMap="BaseResultMap">
+	<![CDATA[SELECT c.*,(SELECT NAME FROM stage WHERE id = stage_id) AS stageName
+	FROM `user` u 
+	INNER JOIN user_classes uc ON u.`id`=uc.`user_id`
+	INNER JOIN classes c ON uc.`classes_id`=c.`id`
+	WHERE u.`id`=#{teacherId,jdbcType=INTEGER}
+		AND c.`id` IN (SELECT 
+				    SUBSTRING_INDEX(SUBSTRING_INDEX(exam.`classes_ids`,',',help_topic_id+1),',',-1) AS num 
+				FROM 
+				    mysql.help_topic,exam
+				WHERE 
+				    help_topic_id < LENGTH(exam.`classes_ids`)-LENGTH(REPLACE(exam.`classes_ids`,',',''))+1
+				    
+				  AND exam.`id`=#{examId,jdbcType=INTEGER})]]>
+  </select>
+  
+  
+  <!-- 根据id 查询班级 -->
+  <select id="getClassesById" parameterType="int" resultMap="BaseResultMap">
+  	select <include refid="Base_Column_List"/>
+  	from classes
+  	where id = #{id}
+  </select>
+  <select id="getClassesByStudentId" resultMap="BaseResultMap">
+	select c.*
+	from  student s,classes c
+	where s.`classes_id` = c.`id`
+	and c.`ison` = 1
+	and s.`id`= #{studentId,jdbcType=INTEGER}
+  </select>
+  
+ <!-- 查询符合分页条件的班级总数 -->
+  <select id="getCount" resultType="java.lang.Integer">
+ 	select COUNT(0) from classes c where 1=1
+  		<if test="teacherName!=null">
+  			and id in(
+				select classes_id from user_classes where user_id = (
+					select id from `user` where nick_name like CONCAT('%',#{teacherName},'%')
+				)
+			)
+		</if>
+  	<if test="classesId != null">
+ 		and c.id = #{classesId,jdbcType=INTEGER}
+ 	</if>
+  </select>
+  
+
+  <!-- 根据条件查询班级分页数据 -->
+  <select id="getClassesListByPage"  resultMap="BaseResultMap">
+  	select c.id, c.class_name, c.shift_time,  c.stage_id, c.ison,
+  		(select name from stage where stage.id = c.stage_id) as stageName  from classes c
+  		where 1=1
+  		<if test="teacherName!=null">
+  			and id in(
+				select classes_id from user_classes where user_id = (
+					select id from `user` where nick_name like CONCAT('%',#{teacherName},'%')
+				)
+			)
+		</if>
+  	<if test="classesId != null">
+ 		and c.id = #{classesId,jdbcType=INTEGER}
+ 	</if>
+  	order by c.stage_id,c.shift_time DESC
+  	limit #{offset},#{limit}
+  </select>
+  <select id="getClassesListByTeacherId" resultMap="BaseResultMap">
+  	select c.*,(select name from stage where id = stage_id) as stageName
+	from `user` u inner join user_classes uc on u.`id`=uc.`user_id`
+	inner join classes c on uc.`classes_id`=c.`id`
+	where u.`id`=#{teacherId,jdbcType=INTEGER}
+  </select>
+  
+  <select id="getClassesListByNoPage" resultMap="BaseResultMap">
+  	select 
+    <include refid="Base_Column_List" />
+    from classes
+    where ison = #{ison,jdbcType=INTEGER}
+    order by stage_id,  class_name DESC
+  </select>
+  
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from classes
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from classes
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.inter.pojo.school.Classes">
+    insert into classes (id, class_name, shift_time, 
+      stage_id, ison)
+    values (#{id,jdbcType=INTEGER}, #{className,jdbcType=VARCHAR}, #{shiftTime,jdbcType=DATE}, 
+      #{stageId,jdbcType=INTEGER}, #{ison,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" keyProperty="id" useGeneratedKeys="true" parameterType="com.inter.pojo.school.Classes">
+    insert into classes
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="className != null">
+        class_name,
+      </if>
+      <if test="shiftTime != null">
+        shift_time,
+      </if>
+      <if test="stageId != null">
+        stage_id,
+      </if>
+      <if test="ison != null">
+        ison,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="className != null">
+        #{className,jdbcType=VARCHAR},
+      </if>
+      <if test="shiftTime != null">
+        #{shiftTime,jdbcType=DATE},
+      </if>
+      <if test="stageId != null">
+        #{stageId,jdbcType=INTEGER},
+      </if>
+      <if test="ison != null">
+        #{ison,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.inter.pojo.school.Classes">
+    update classes
+    <set>
+      <if test="className != null">
+        class_name = #{className,jdbcType=VARCHAR},
+      </if>
+      <if test="shiftTime != null">
+        shift_time = #{shiftTime,jdbcType=DATE},
+      </if>
+      <if test="stageId != null">
+        stage_id = #{stageId,jdbcType=INTEGER},
+      </if>
+      <if test="ison != null">
+        ison = #{ison,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.inter.pojo.school.Classes">
+    update classes
+    set class_name = #{className,jdbcType=VARCHAR},
+      shift_time = #{shiftTime,jdbcType=DATE},
+      stage_id = #{stageId,jdbcType=INTEGER},
+      ison = #{ison,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

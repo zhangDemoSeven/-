@@ -1,0 +1,480 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.inter.mapper.system.UserMapper">
+  <resultMap id="BaseResultMap" type="com.inter.pojo.system.User">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="username" jdbcType="VARCHAR" property="username" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
+    <result column="cord" jdbcType="VARCHAR" property="cord" />
+    <result column="telephone_a" jdbcType="VARCHAR" property="telephoneA" />
+    <result column="telephone_b" jdbcType="VARCHAR" property="telephoneB" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+    <result column="birthday" jdbcType="TIMESTAMP" property="birthday" />
+    <result column="identity" jdbcType="VARCHAR" property="identity" />
+    <result column="level" jdbcType="VARCHAR" property="level" />
+    <result column="prohibition" jdbcType="VARCHAR" property="prohibition" />
+    <result column="status" jdbcType="VARCHAR" property="status" />
+    <result column="create_user" jdbcType="VARCHAR" property="createUser" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="modify_user" jdbcType="VARCHAR" property="modifyUser" />
+    <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+    <result column="address" jdbcType="VARCHAR" property="address" />
+    <result column="sex" jdbcType="VARCHAR" property="sex" />
+    <result column="is_temp" jdbcType="VARCHAR" property="isTemp" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, username, password, nick_name, cord, telephone_a, telephone_b, email, birthday, 
+    identity, level, prohibition, status, create_user, create_time, modify_user, modify_time, 
+    description, address, sex, is_temp
+  </sql>
+  
+  <select id="getUserByStudentId" resultMap="BaseResultMap">
+  	select u.*
+	from `user` u ,student s
+	where u.`id`=s.`user_id`
+	and s.`is_over` = '1'
+	and u.`status` = '1'
+	and u.`prohibition` = '1'
+	and u.`is_temp` = '1'
+	and s.`id`=#{studentId,jdbcType=INTEGER}
+  </select>
+  
+  <select id="checkUsername" resultMap="BaseResultMap">
+ 	select 
+ 	id, username, password, nick_name, cord, telephone_a, telephone_b, email, birthday, 
+   	identity, level, prohibition, status, create_user, create_time, modify_user, modify_time, 
+   	description, address, sex,is_temp,
+   	(select name from identity where id = identity) as identityName,
+   	(select name from level where id = level) as levelName
+  	from `user`
+  	where username = #{username,jdbcType=VARCHAR}
+  </select>
+  
+  
+  <select id="checkNickNameAndTelephoneA" resultMap="BaseResultMap">
+  	select 
+  		id, username, password, nick_name, cord, telephone_a, telephone_b, email, birthday, 
+    	identity, level, prohibition, status, create_user, create_time, modify_user, modify_time, 
+    	description, address, sex,is_temp,
+    	(select name from identity where id = identity) as identityName,
+    	(select name from level where id = level) as levelName
+  	from `user` 
+  	where nick_name = #{nickName,jdbcType=VARCHAR}
+  	and telephone_a = #{telephoneA,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="getTeacherListByClassesId" resultMap="BaseResultMap">
+  	select u.*
+	from `user` u,user_classes uc,classes c
+	where c.`id`=uc.`classes_id`
+	and uc.`user_id`=u.`id`
+	and c.`id`=#{classesId,jdbcType=INTEGER}
+	and u.`is_temp`='1'
+	and u.`status` = '1'
+	and u.`prohibition` = '1'
+	and <![CDATA[  u.`identity` <> 9 ]]>
+  </select>
+  
+<select id="getTeacherListByPage" parameterType="com.inter.pojo.system.User" resultMap="BaseResultMap">
+  	select 
+		id,
+		username, 
+		`password`, 
+		nick_name, 
+		cord, 
+		telephone_a, 
+		telephone_b, 
+		email, 
+		birthday, 
+		identity, 
+		`level`, 
+		prohibition, 
+		`status`, 
+		create_user, 
+		create_time, 
+		modify_user, 
+		modify_time, 
+   	 	description, 
+   	 	address, 
+   	 	sex,
+   	 	is_temp,
+   	 	(select name from level where id= level) as levelName,
+   	 	(select name from identity where id = identity) as identityName
+   	 from `user` u 
+   	 where 1=1
+   	<if test="queryIdentity == null">
+  	and <![CDATA[ identity <> #{identity,jdbcType=VARCHAR} ]]>
+  	</if>
+  	<if test="queryIdentity != null and queryIdentity != 9">
+  	and identity = #{queryIdentity}
+  	</if>
+  	<if test="queryIdentity != null and queryIdentity == 9">
+  	and <![CDATA[ identity <> #{identity,jdbcType=VARCHAR} ]]>
+  	</if>
+  	<if test="teacherName != null">
+  	and nick_name like CONCAT("%",#{teacherName},"%")
+  	</if>
+  	<if test="level != null">
+  	and level = #{level}
+  	</if>
+  	<if test="classesId != null">
+  	and u.id in(
+		select user_id from user_classes where classes_id = #{classesId}
+	)
+  	</if>
+  	and status = '1'
+  	and prohibition = '1'
+  	and is_temp = '1'
+   	order by create_time DESC
+    limit #{offset},#{limit}
+  </select>
+  
+  <select id="getTeacherCount" resultType="java.lang.Integer">
+ 	select 
+ 		COUNT(0)
+ 	from `user` u 
+   	 where 1=1
+   	<if test="queryIdentity == null">
+  	and <![CDATA[ identity <> #{identity,jdbcType=VARCHAR} ]]>
+  	</if>
+  	<if test="queryIdentity != null and queryIdentity != 9">
+  	and identity = #{queryIdentity}
+  	</if>
+  	<if test="queryIdentity != null and queryIdentity == 9">
+  	and <![CDATA[ identity <> #{identity,jdbcType=VARCHAR} ]]>
+  	</if>
+  	<if test="teacherName != null">
+  	and nick_name like CONCAT("%",#{teacherName},"%")
+  	</if>
+  	<if test="level != null">
+  	and level = #{level}
+  	</if>
+  	<if test="classesId != null">
+  	and u.id in(select user_id from user_classes where classes_id = #{classesId})
+  	</if>
+  	and status = '1'
+  	and prohibition = '1'
+  	and is_temp = '1'
+  </select>
+  
+  <select id="getTeachListByIdentity" resultMap="BaseResultMap">
+  	select 
+  		<include refid="Base_Column_List" />
+  	from `user` 
+  	where status = '1' 
+  	and prohibition = '1'
+  	and is_temp = '1'
+  	and identity = #{identity,jdbcType=VARCHAR}
+  	order by create_time DESC
+  </select>
+  
+   <!-- 插入用户数据并主键返回 -->
+  <insert id="saveUserAndBackPrimaryKey" keyProperty="id" useGeneratedKeys="true" parameterType="com.inter.pojo.system.User">
+    insert into `user` (id, username, password, 
+      nick_name, cord, telephone_a, 
+      telephone_b, email, birthday, 
+      identity, level, prohibition, 
+      status, create_user, create_time, 
+      modify_user, modify_time, description, 
+      address, sex,is_temp)
+    values (#{id,jdbcType=INTEGER}, #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
+      #{nickName,jdbcType=VARCHAR}, #{cord,jdbcType=VARCHAR}, #{telephoneA,jdbcType=VARCHAR}, 
+      #{telephoneB,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{birthday,jdbcType=TIMESTAMP}, 
+      #{identity,jdbcType=VARCHAR}, #{level,jdbcType=VARCHAR}, #{prohibition,jdbcType=VARCHAR}, 
+      #{status,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{modifyUser,jdbcType=VARCHAR}, #{modifyTime,jdbcType=TIMESTAMP}, #{description,jdbcType=VARCHAR}, 
+      #{address,jdbcType=VARCHAR}, #{sex,jdbcType=VARCHAR},#{isTemp,jdbcType=VARCHAR})
+  </insert>
+  
+  
+  <!-- ......................用户列表相关  start.............................. -->
+  <select id="getCount" resultType="java.lang.Integer">
+  	select count(0) from `user` where 
+  		status = '1' 
+  		<if test="userName != null">
+  			 and nick_name like CONCAT("%",#{userName,jdbcType=VARCHAR},"%") 
+  		</if>
+  		and is_temp = '1' 
+  		and <![CDATA[  `identity` <> 9 ]]>
+  </select>
+
+  <select id="getUserListByPage"  resultMap="BaseResultMap">
+  	select 
+  		<include refid="Base_Column_List" />,
+  		(select name from identity where id = identity) as identityName,
+   		(select name from level where id = level) as levelName
+  	from `user` 
+  	where status = '1'
+  	<if test="userName != null">
+  		and nick_name like CONCAT("%",#{userName,jdbcType=VARCHAR},"%") 
+  	</if> 
+  	and <![CDATA[  `identity` <> 9 ]]>
+  	order by create_time desc
+  	limit #{offset},#{limit}
+  </select>
+
+<!-- ......................用户列表相关  end.............................. -->  
+  
+  <select id="findUserByUsername" resultMap="BaseResultMap">
+  	select 
+    	<include refid="Base_Column_List" />
+    from `user`
+    where status = '1'
+    and prohibition = '1'
+    and username = #{username,jdbcType=VARCHAR} 
+  </select>
+  
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from user
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from user
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.inter.pojo.system.User">
+    insert into user (id, username, password, 
+      nick_name, cord, telephone_a, 
+      telephone_b, email, birthday, 
+      identity, level, prohibition, 
+      status, create_user, create_time, 
+      modify_user, modify_time, description, 
+      address, sex, is_temp
+      )
+    values (#{id,jdbcType=INTEGER}, #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
+      #{nickName,jdbcType=VARCHAR}, #{cord,jdbcType=VARCHAR}, #{telephoneA,jdbcType=VARCHAR}, 
+      #{telephoneB,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{birthday,jdbcType=TIMESTAMP}, 
+      #{identity,jdbcType=VARCHAR}, #{level,jdbcType=VARCHAR}, #{prohibition,jdbcType=VARCHAR}, 
+      #{status,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{modifyUser,jdbcType=VARCHAR}, #{modifyTime,jdbcType=TIMESTAMP}, #{description,jdbcType=VARCHAR}, 
+      #{address,jdbcType=VARCHAR}, #{sex,jdbcType=VARCHAR}, #{isTemp,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.inter.pojo.system.User">
+    insert into user
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="username != null">
+        username,
+      </if>
+      <if test="password != null">
+        password,
+      </if>
+      <if test="nickName != null">
+        nick_name,
+      </if>
+      <if test="cord != null">
+        cord,
+      </if>
+      <if test="telephoneA != null">
+        telephone_a,
+      </if>
+      <if test="telephoneB != null">
+        telephone_b,
+      </if>
+      <if test="email != null">
+        email,
+      </if>
+      <if test="birthday != null">
+        birthday,
+      </if>
+      <if test="identity != null">
+        identity,
+      </if>
+      <if test="level != null">
+        level,
+      </if>
+      <if test="prohibition != null">
+        prohibition,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="createUser != null">
+        create_user,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="modifyUser != null">
+        modify_user,
+      </if>
+      <if test="modifyTime != null">
+        modify_time,
+      </if>
+      <if test="description != null">
+        description,
+      </if>
+      <if test="address != null">
+        address,
+      </if>
+      <if test="sex != null">
+        sex,
+      </if>
+      <if test="isTemp != null">
+        is_temp,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="username != null">
+        #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="nickName != null">
+        #{nickName,jdbcType=VARCHAR},
+      </if>
+      <if test="cord != null">
+        #{cord,jdbcType=VARCHAR},
+      </if>
+      <if test="telephoneA != null">
+        #{telephoneA,jdbcType=VARCHAR},
+      </if>
+      <if test="telephoneB != null">
+        #{telephoneB,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null">
+        #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="birthday != null">
+        #{birthday,jdbcType=TIMESTAMP},
+      </if>
+      <if test="identity != null">
+        #{identity,jdbcType=VARCHAR},
+      </if>
+      <if test="level != null">
+        #{level,jdbcType=VARCHAR},
+      </if>
+      <if test="prohibition != null">
+        #{prohibition,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="createUser != null">
+        #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifyUser != null">
+        #{modifyUser,jdbcType=VARCHAR},
+      </if>
+      <if test="modifyTime != null">
+        #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="description != null">
+        #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null">
+        #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null">
+        #{sex,jdbcType=VARCHAR},
+      </if>
+      <if test="isTemp != null">
+        #{isTemp,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.inter.pojo.system.User">
+    update user
+    <set>
+      <if test="username != null">
+        username = #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="nickName != null">
+        nick_name = #{nickName,jdbcType=VARCHAR},
+      </if>
+      <if test="cord != null">
+        cord = #{cord,jdbcType=VARCHAR},
+      </if>
+      <if test="telephoneA != null">
+        telephone_a = #{telephoneA,jdbcType=VARCHAR},
+      </if>
+      <if test="telephoneB != null">
+        telephone_b = #{telephoneB,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null">
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="birthday != null">
+        birthday = #{birthday,jdbcType=TIMESTAMP},
+      </if>
+      <if test="identity != null">
+        identity = #{identity,jdbcType=VARCHAR},
+      </if>
+      <if test="level != null">
+        level = #{level,jdbcType=VARCHAR},
+      </if>
+      <if test="prohibition != null">
+        prohibition = #{prohibition,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="createUser != null">
+        create_user = #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifyUser != null">
+        modify_user = #{modifyUser,jdbcType=VARCHAR},
+      </if>
+      <if test="modifyTime != null">
+        modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="description != null">
+        description = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null">
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null">
+        sex = #{sex,jdbcType=VARCHAR},
+      </if>
+      <if test="isTemp != null">
+        is_temp = #{isTemp,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.inter.pojo.system.User">
+    update user
+    set username = #{username,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR},
+      nick_name = #{nickName,jdbcType=VARCHAR},
+      cord = #{cord,jdbcType=VARCHAR},
+      telephone_a = #{telephoneA,jdbcType=VARCHAR},
+      telephone_b = #{telephoneB,jdbcType=VARCHAR},
+      email = #{email,jdbcType=VARCHAR},
+      birthday = #{birthday,jdbcType=TIMESTAMP},
+      identity = #{identity,jdbcType=VARCHAR},
+      level = #{level,jdbcType=VARCHAR},
+      prohibition = #{prohibition,jdbcType=VARCHAR},
+      status = #{status,jdbcType=VARCHAR},
+      create_user = #{createUser,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      modify_user = #{modifyUser,jdbcType=VARCHAR},
+      modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      description = #{description,jdbcType=VARCHAR},
+      address = #{address,jdbcType=VARCHAR},
+      sex = #{sex,jdbcType=VARCHAR},
+      is_temp = #{isTemp,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.inter.mapper.dictionaries.BooksMapper">
+  <resultMap id="BaseResultMap" type="com.inter.pojo.dictionaries.Books">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="prohibition" jdbcType="VARCHAR" property="prohibition" />
+    <result column="status" jdbcType="VARCHAR" property="status" />
+    <result column="stage_id" jdbcType="INTEGER" property="stageId" />
+    <result column="create_user" jdbcType="VARCHAR" property="createUser" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="modify_user" jdbcType="VARCHAR" property="modifyUser" />
+    <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, name, prohibition, status, stage_id, create_user, create_time, modify_user, modify_time,
+    (select name from stage where id = stage_id) as stageName
+  </sql>
+  
+  <select id="getBooksListByStageId" resultMap="BaseResultMap">
+  	select 
+    <include refid="Base_Column_List" />
+    from books
+    where status = '1'
+    and prohibition = '1'
+    and stage_id = #{stageId,jdbcType=INTEGER}
+  </select>
+  
+  <select id="getCount" resultType="java.lang.Integer">
+  	select count(0) from books where status = '1'
+  	<if test="booksName != null">
+  		 and name like CONCAT("%",#{booksName,jdbcType=VARCHAR},"%")
+  	</if>
+  </select>
+  
+  <select id="getBooksListByPage" resultMap="BaseResultMap">
+  	select 
+  		<include refid="Base_Column_List" />
+  	from books
+  	where status = '1'
+  	<if test="booksName != null">
+  		 and name like CONCAT("%",#{booksName,jdbcType=VARCHAR},"%")
+  	</if>
+  	order by id ASC
+  	limit #{offset},#{limit}
+  </select>
+  
+  <select id="getBooksListByNoPage" resultMap="BaseResultMap">
+  	 select 
+    <include refid="Base_Column_List" />
+    from books
+    where status = '1'
+    and prohibition = '1'
+  </select>
+  
+  
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from books
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from books
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.inter.pojo.dictionaries.Books">
+    insert into books (id, name, prohibition, 
+      status, stage_id, create_user, 
+      create_time, modify_user, modify_time
+      )
+    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{prohibition,jdbcType=VARCHAR}, 
+      #{status,jdbcType=VARCHAR}, #{stageId,jdbcType=INTEGER}, #{createUser,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{modifyUser,jdbcType=VARCHAR}, #{modifyTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.inter.pojo.dictionaries.Books">
+    insert into books
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="name != null">
+        name,
+      </if>
+      <if test="prohibition != null">
+        prohibition,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="stageId != null">
+        stage_id,
+      </if>
+      <if test="createUser != null">
+        create_user,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="modifyUser != null">
+        modify_user,
+      </if>
+      <if test="modifyTime != null">
+        modify_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="prohibition != null">
+        #{prohibition,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="stageId != null">
+        #{stageId,jdbcType=INTEGER},
+      </if>
+      <if test="createUser != null">
+        #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifyUser != null">
+        #{modifyUser,jdbcType=VARCHAR},
+      </if>
+      <if test="modifyTime != null">
+        #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.inter.pojo.dictionaries.Books">
+    update books
+    <set>
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="prohibition != null">
+        prohibition = #{prohibition,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="stageId != null">
+        stage_id = #{stageId,jdbcType=INTEGER},
+      </if>
+      <if test="createUser != null">
+        create_user = #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifyUser != null">
+        modify_user = #{modifyUser,jdbcType=VARCHAR},
+      </if>
+      <if test="modifyTime != null">
+        modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.inter.pojo.dictionaries.Books">
+    update books
+    set name = #{name,jdbcType=VARCHAR},
+      prohibition = #{prohibition,jdbcType=VARCHAR},
+      status = #{status,jdbcType=VARCHAR},
+      stage_id = #{stageId,jdbcType=INTEGER},
+      create_user = #{createUser,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      modify_user = #{modifyUser,jdbcType=VARCHAR},
+      modify_time = #{modifyTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

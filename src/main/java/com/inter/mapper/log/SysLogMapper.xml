@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.inter.mapper.log.SysLogMapper">
+  <resultMap id="BaseResultMap" type="com.inter.pojo.log.SysLog">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
+    <result column="model" jdbcType="VARCHAR" property="model" />
+    <result column="method" jdbcType="VARCHAR" property="method" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+    <result column="ip" jdbcType="VARCHAR" property="ip" />
+    <result column="date" jdbcType="TIMESTAMP" property="date" />
+    <result column="is_ok" jdbcType="VARCHAR" property="isOk" />
+    <result column="message" jdbcType="VARCHAR" property="message" />
+    <result column="source" jdbcType="VARCHAR" property="source" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, nick_name, model, method, url, ip, date, is_ok, message,source
+  </sql>
+  
+  <select id="getCount" resultType="java.lang.Integer">
+  	select count(0) from log
+  	 where 1 = 1
+    <if test="methodName != null">
+   		and method like CONCAT("%",#{methodName,jdbcType=VARCHAR},"%")
+    </if>
+    <if test="isOk != null">
+   		and is_ok like CONCAT("%",#{isOk,jdbcType=VARCHAR},"%")
+    </if>
+    <if test="modelName != null">
+   		and model like CONCAT("%",#{modelName,jdbcType=VARCHAR},"%")
+    </if>
+    <if test="startTime != null and endTime != null">
+    	and date between #{startTime} and #{endTime}
+    </if>
+  </select>
+  
+  <select id="getLogListByPage" resultMap="BaseResultMap">
+  	select
+  	 <include refid="Base_Column_List" />
+    from log
+    where 1 = 1
+    <if test="methodName != null">
+   		and method like CONCAT("%",#{methodName,jdbcType=VARCHAR},"%")
+    </if>
+    <if test="isOk != null">
+   		and is_ok like CONCAT("%",#{isOk,jdbcType=VARCHAR},"%")
+    </if>
+    <if test="modelName != null">
+   		and model like CONCAT("%",#{modelName,jdbcType=VARCHAR},"%")
+    </if>
+    <if test="startTime != null and endTime != null">
+    	and date between #{startTime} and #{endTime}
+    </if>
+    order by date DESC
+    limit #{offset},#{limit}
+  </select>
+  
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from log
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from log
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.inter.pojo.log.SysLog">
+    insert into log (id, nick_name, model, 
+      method, url, ip, date, 
+      is_ok, message,source)
+    values (#{id,jdbcType=INTEGER}, #{nickName,jdbcType=VARCHAR}, #{model,jdbcType=VARCHAR}, 
+      #{method,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR}, #{ip,jdbcType=VARCHAR}, #{date,jdbcType=TIMESTAMP}, 
+      #{isOk,jdbcType=VARCHAR}, #{message,jdbcType=VARCHAR}),#{source,jdbcType=VARCHAR}
+  </insert>
+  <insert id="insertSelective" parameterType="com.inter.pojo.log.SysLog">
+    insert into log
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="nickName != null">
+        nick_name,
+      </if>
+      <if test="model != null">
+        model,
+      </if>
+      <if test="method != null">
+        method,
+      </if>
+      <if test="url != null">
+        url,
+      </if>
+      <if test="ip != null">
+        ip,
+      </if>
+      <if test="date != null">
+        date,
+      </if>
+      <if test="isOk != null">
+        is_ok,
+      </if>
+      <if test="message != null">
+        message,
+      </if>
+      <if test="source != null">
+      	source,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="nickName != null">
+        #{nickName,jdbcType=VARCHAR},
+      </if>
+      <if test="model != null">
+        #{model,jdbcType=VARCHAR},
+      </if>
+      <if test="method != null">
+        #{method,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null">
+        #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="ip != null">
+        #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="date != null">
+        #{date,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isOk != null">
+        #{isOk,jdbcType=VARCHAR},
+      </if>
+      <if test="message != null">
+        #{message,jdbcType=VARCHAR},
+      </if>
+      <if test="source != null">
+      	#{source,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.inter.pojo.log.SysLog">
+    update log
+    <set>
+      <if test="nickName != null">
+        nick_name = #{nickName,jdbcType=VARCHAR},
+      </if>
+      <if test="model != null">
+        model = #{model,jdbcType=VARCHAR},
+      </if>
+      <if test="method != null">
+        method = #{method,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null">
+        url = #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="ip != null">
+        ip = #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="date != null">
+        date = #{date,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isOk != null">
+        is_ok = #{isOk,jdbcType=VARCHAR},
+      </if>
+      <if test="message != null">
+        message = #{message,jdbcType=VARCHAR},
+      </if>
+       <if test="source != null">
+        source = #{source,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.inter.pojo.log.SysLog">
+    update log
+    set nick_name = #{nickName,jdbcType=VARCHAR},
+      model = #{model,jdbcType=VARCHAR},
+      method = #{method,jdbcType=VARCHAR},
+      url = #{url,jdbcType=VARCHAR},
+      ip = #{ip,jdbcType=VARCHAR},
+      date = #{date,jdbcType=TIMESTAMP},
+      is_ok = #{isOk,jdbcType=VARCHAR},
+      message = #{message,jdbcType=VARCHAR},
+      source = #{source,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.inter.mapper.school.StudentMapper">
+  <resultMap id="BaseResultMap" type="com.inter.pojo.school.Student">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="age" jdbcType="INTEGER" property="age" />
+    <result column="qq" jdbcType="VARCHAR" property="qq" />
+    <result column="sub_name" jdbcType="VARCHAR" property="subName" />
+    <result column="search_name" jdbcType="VARCHAR" property="searchName" />
+    <result column="unque_code" jdbcType="VARCHAR" property="unqueCode" />
+    <result column="is_over" jdbcType="VARCHAR" property="isOver" />
+    <result column="classes_id" jdbcType="INTEGER" property="classesId" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="exam_id" jdbcType="VARCHAR" property="examId" />
+    <result column="education_id" jdbcType="INTEGER" property="educationId" />
+    <result column="major_id" jdbcType="INTEGER" property="majorId" />
+    <result column="stiuation_id" jdbcType="INTEGER" property="stiuationId" />
+    <result column="classification_id" jdbcType="INTEGER" property="classificationId" />
+    <result column="source_id" jdbcType="INTEGER" property="sourceId" />
+    <result column="tool_id" jdbcType="INTEGER" property="toolId" />
+    <result column="channel_id" jdbcType="INTEGER" property="channelId" />
+    <result column="user1" jdbcType="INTEGER" property="user1" />
+    <result column="user2" jdbcType="INTEGER" property="user2" />
+    <result column="user3" jdbcType="INTEGER" property="user3" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, age, qq, sub_name, search_name, unque_code, is_over, classes_id, user_id, exam_id, 
+    education_id, major_id, stiuation_id, classification_id, source_id, tool_id, channel_id, 
+    user1, user2, user3
+  </sql>
+  <select id="getStudentByClassesId" resultMap="BaseResultMap">
+  	select
+	  	id, age, qq, sub_name, search_name, unque_code, is_over, classes_id, user_id, exam_id, 
+	    education_id, major_id, stiuation_id, classification_id, source_id, tool_id, channel_id, 
+	    user1, user2, user3
+	from student
+	where classes_id = #{classesId,jdbcType=INTEGER}
+	and is_over = '1'
+  </select>
+  
+ <select id="getStudentListNoPage" resultMap="BaseResultMap">
+  	select s.*,u.*
+	from `USER` u ,student s
+	where s.`user_id`=u.`id`
+	and s.`is_over` = '1'
+	and u.`status` = '1'
+	and u.`prohibition` = '1'
+	and u.`is_temp` = '1'
+	order by s.classes_id,u.create_time ASC
+  </select>
+  
+  <select id="getStudentByUserId" resultMap="BaseResultMap">
+  		select id, age, qq, sub_name, search_name, unque_code, is_over, classes_id, user_id, exam_id, 
+	    education_id, major_id, stiuation_id, classification_id, source_id, tool_id, channel_id, 
+	    user1, user2, user3,
+	    (select class_name from classes where id=classes_id) as classesNames,
+	    (select name from education where id = education_id) as educationName,
+	    (select name from major where id = major_id) as majorName,
+	    (select name from stiuation where id = stiuation_id) as situationName,
+	    (select name from classification where id = classification_id) as classificationName
+		from student s
+		where s.`user_id`=#{userId,jdbcType=INTEGER}
+  </select>
+  
+  <select id="getOkOrNoStudentCount" resultType="java.lang.Integer">
+  	select count(0)
+	from `user` u ,student s
+	where u.`id` = s.`user_id`
+	and u.`identity` = #{identity,jdbcType=VARCHAR}
+	and u.`status` = '1'
+	and s.`is_over` = '1'
+	<if test="isTemp != null">
+		and u.`is_temp` = #{isTemp,jdbcType=VARCHAR}
+	</if>
+	<if test="userName != null">
+		and u.nick_name like CONCAT("%",#{userName,jdbcType=VARCHAR},"%")
+	</if>
+	<if test="startDate != null and endDate != null">
+		and u.create_time between #{startDate} and #{endDate}
+	</if>
+	<if test="user1 != null">
+		and s.user1 = #{user1,jdbcType=INTEGER}
+	</if>
+	<if test="user2 != null">
+		and s.user2 = #{user2,jdbcType=INTEGER}
+	</if>
+	<if test="user3 != null">
+		and s.user3 = #{user3,jdbcType=INTEGER}
+	</if>
+  </select>
+  
+  <select id="getOkOrNoStudentByPage" parameterType="com.inter.vo.UserStudentVo" resultType="com.inter.vo.UserStudentVo">
+  	select 
+  		u.id, u.username, u.password, u.nick_name AS nickName, u.cord, u.telephone_a AS telephoneA, u.telephone_b AS telephoneB, u.email, 
+	  	u.birthday,u.identity, u.level, u.prohibition, u.status, u.create_user AS createUser, u.create_time AS createTime,u.modify_user AS modifyUser,
+	  	u.modify_time AS modifyTime,u.description, u.address, u.sex,u.is_temp as isTemp,
+	  	s.age, s.qq, s.sub_name AS subName, s.search_name AS searchName, s.unque_code AS unqueCode, s.is_over AS isOver, s.classes_id AS classesId, 
+	  	s.user_id AS userId,s.exam_id AS examId,s.education_id AS educationId, s.major_id AS majorId, s.stiuation_id AS stiuationId, 
+	  	s.classification_id AS classificationId, s.source_id AS sourceId, s.tool_id AS toolId, s.channel_id AS channelId,s.user1, s.user2, s.user3,
+	  	(SELECT NAME FROM LEVEL WHERE id= u.level) AS levelName,
+   	 	(SELECT NAME FROM identity WHERE id = u.identity) AS identityName,
+   	 	(select class_name from classes where id =  classes_id) as classesNames,
+   	 	(SELECT NAME FROM education WHERE id = education_id) AS educationName,
+   	 	(SELECT NAME FROM major WHERE id =  major_id) AS majorName,
+   	 	(SELECT NAME FROM stiuation WHERE id =  stiuation_id) AS stiuationName,
+   	 	(SELECT NAME FROM classification WHERE id =  classification_id) AS classificationName,
+   	 	(SELECT source_name FROM source WHERE id =  source_id) AS sourceName,
+   	 	(SELECT tool_name FROM tool WHERE id =  tool_id) AS toolName,
+   	 	(SELECT channel_name FROM channel WHERE id =  channel_id) AS channelName,
+   	 	(SELECT nick_name FROM USER WHERE id =  user1) AS user1Name,
+   	 	(SELECT nick_name FROM USER WHERE id =  user2) AS user2Name,
+   	 	(SELECT nick_name FROM USER WHERE id =  user3) AS user3Name
+	from `user` u ,student s
+	where u.`id` = s.`user_id`
+	and u.`identity` = #{identity,jdbcType=VARCHAR}
+	and u.`status` = '1'
+	and s.`is_over` = '1'
+	<if test="isTemp != null">
+		and u.`is_temp` = #{isTemp,jdbcType=VARCHAR}
+	</if>
+	<if test="userName != null">
+		and u.nick_name like CONCAT("%",#{userName,jdbcType=VARCHAR},"%")
+	</if>
+	<if test="startDate != null and endDate != null">
+		and u.create_time between #{startDate} and #{endDate}
+	</if>
+	<if test="user1 != null">
+		and s.user1 = #{user1,jdbcType=INTEGER}
+	</if>
+	<if test="user2 != null">
+		and s.user2 = #{user2,jdbcType=INTEGER}
+	</if>
+	<if test="user3 != null">
+		and s.user3 = #{user3,jdbcType=INTEGER}
+	</if>
+	order by u.create_time DESC
+	limit #{offset},#{limit}
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from student
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from student
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.inter.pojo.school.Student">
+    insert into student (id, age, qq, 
+      sub_name, search_name, unque_code, 
+      is_over, classes_id, user_id, 
+      exam_id, education_id, major_id, 
+      stiuation_id, classification_id, source_id, 
+      tool_id, channel_id, user1, 
+      user2, user3)
+    values (#{id,jdbcType=INTEGER}, #{age,jdbcType=INTEGER}, #{qq,jdbcType=VARCHAR}, 
+      #{subName,jdbcType=VARCHAR}, #{searchName,jdbcType=VARCHAR}, #{unqueCode,jdbcType=VARCHAR}, 
+      #{isOver,jdbcType=VARCHAR}, #{classesId,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, 
+      #{examId,jdbcType=VARCHAR}, #{educationId,jdbcType=INTEGER}, #{majorId,jdbcType=INTEGER}, 
+      #{stiuationId,jdbcType=INTEGER}, #{classificationId,jdbcType=INTEGER}, #{sourceId,jdbcType=INTEGER}, 
+      #{toolId,jdbcType=INTEGER}, #{channelId,jdbcType=INTEGER}, #{user1,jdbcType=INTEGER}, 
+      #{user2,jdbcType=INTEGER}, #{user3,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.inter.pojo.school.Student">
+    insert into student
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="age != null">
+        age,
+      </if>
+      <if test="qq != null">
+        qq,
+      </if>
+      <if test="subName != null">
+        sub_name,
+      </if>
+      <if test="searchName != null">
+        search_name,
+      </if>
+      <if test="unqueCode != null">
+        unque_code,
+      </if>
+      <if test="isOver != null">
+        is_over,
+      </if>
+      <if test="classesId != null">
+        classes_id,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="examId != null">
+        exam_id,
+      </if>
+      <if test="educationId != null">
+        education_id,
+      </if>
+      <if test="majorId != null">
+        major_id,
+      </if>
+      <if test="stiuationId != null">
+        stiuation_id,
+      </if>
+      <if test="classificationId != null">
+        classification_id,
+      </if>
+      <if test="sourceId != null">
+        source_id,
+      </if>
+      <if test="toolId != null">
+        tool_id,
+      </if>
+      <if test="channelId != null">
+        channel_id,
+      </if>
+      <if test="user1 != null">
+        user1,
+      </if>
+      <if test="user2 != null">
+        user2,
+      </if>
+      <if test="user3 != null">
+        user3,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="age != null">
+        #{age,jdbcType=INTEGER},
+      </if>
+      <if test="qq != null">
+        #{qq,jdbcType=VARCHAR},
+      </if>
+      <if test="subName != null">
+        #{subName,jdbcType=VARCHAR},
+      </if>
+      <if test="searchName != null">
+        #{searchName,jdbcType=VARCHAR},
+      </if>
+      <if test="unqueCode != null">
+        #{unqueCode,jdbcType=VARCHAR},
+      </if>
+      <if test="isOver != null">
+        #{isOver,jdbcType=VARCHAR},
+      </if>
+      <if test="classesId != null">
+        #{classesId,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="examId != null">
+        #{examId,jdbcType=VARCHAR},
+      </if>
+      <if test="educationId != null">
+        #{educationId,jdbcType=INTEGER},
+      </if>
+      <if test="majorId != null">
+        #{majorId,jdbcType=INTEGER},
+      </if>
+      <if test="stiuationId != null">
+        #{stiuationId,jdbcType=INTEGER},
+      </if>
+      <if test="classificationId != null">
+        #{classificationId,jdbcType=INTEGER},
+      </if>
+      <if test="sourceId != null">
+        #{sourceId,jdbcType=INTEGER},
+      </if>
+      <if test="toolId != null">
+        #{toolId,jdbcType=INTEGER},
+      </if>
+      <if test="channelId != null">
+        #{channelId,jdbcType=INTEGER},
+      </if>
+      <if test="user1 != null">
+        #{user1,jdbcType=INTEGER},
+      </if>
+      <if test="user2 != null">
+        #{user2,jdbcType=INTEGER},
+      </if>
+      <if test="user3 != null">
+        #{user3,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.inter.pojo.school.Student">
+    update student
+    <set>
+      <if test="age != null">
+        age = #{age,jdbcType=INTEGER},
+      </if>
+      <if test="qq != null">
+        qq = #{qq,jdbcType=VARCHAR},
+      </if>
+      <if test="subName != null">
+        sub_name = #{subName,jdbcType=VARCHAR},
+      </if>
+      <if test="searchName != null">
+        search_name = #{searchName,jdbcType=VARCHAR},
+      </if>
+      <if test="unqueCode != null">
+        unque_code = #{unqueCode,jdbcType=VARCHAR},
+      </if>
+      <if test="isOver != null">
+        is_over = #{isOver,jdbcType=VARCHAR},
+      </if>
+      <if test="classesId != null">
+        classes_id = #{classesId,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="examId != null">
+        exam_id = #{examId,jdbcType=VARCHAR},
+      </if>
+      <if test="educationId != null">
+        education_id = #{educationId,jdbcType=INTEGER},
+      </if>
+      <if test="majorId != null">
+        major_id = #{majorId,jdbcType=INTEGER},
+      </if>
+      <if test="stiuationId != null">
+        stiuation_id = #{stiuationId,jdbcType=INTEGER},
+      </if>
+      <if test="classificationId != null">
+        classification_id = #{classificationId,jdbcType=INTEGER},
+      </if>
+      <if test="sourceId != null">
+        source_id = #{sourceId,jdbcType=INTEGER},
+      </if>
+      <if test="toolId != null">
+        tool_id = #{toolId,jdbcType=INTEGER},
+      </if>
+      <if test="channelId != null">
+        channel_id = #{channelId,jdbcType=INTEGER},
+      </if>
+      <if test="user1 != null">
+        user1 = #{user1,jdbcType=INTEGER},
+      </if>
+      <if test="user2 != null">
+        user2 = #{user2,jdbcType=INTEGER},
+      </if>
+      <if test="user3 != null">
+        user3 = #{user3,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.inter.pojo.school.Student">
+    update student
+    set age = #{age,jdbcType=INTEGER},
+      qq = #{qq,jdbcType=VARCHAR},
+      sub_name = #{subName,jdbcType=VARCHAR},
+      search_name = #{searchName,jdbcType=VARCHAR},
+      unque_code = #{unqueCode,jdbcType=VARCHAR},
+      is_over = #{isOver,jdbcType=VARCHAR},
+      classes_id = #{classesId,jdbcType=INTEGER},
+      user_id = #{userId,jdbcType=INTEGER},
+      exam_id = #{examId,jdbcType=VARCHAR},
+      education_id = #{educationId,jdbcType=INTEGER},
+      major_id = #{majorId,jdbcType=INTEGER},
+      stiuation_id = #{stiuationId,jdbcType=INTEGER},
+      classification_id = #{classificationId,jdbcType=INTEGER},
+      source_id = #{sourceId,jdbcType=INTEGER},
+      tool_id = #{toolId,jdbcType=INTEGER},
+      channel_id = #{channelId,jdbcType=INTEGER},
+      user1 = #{user1,jdbcType=INTEGER},
+      user2 = #{user2,jdbcType=INTEGER},
+      user3 = #{user3,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

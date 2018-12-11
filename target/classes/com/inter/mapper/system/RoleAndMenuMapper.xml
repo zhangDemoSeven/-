@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.inter.mapper.system.RoleAndMenuMapper">
+  <resultMap id="BaseResultMap" type="com.inter.pojo.system.RoleAndMenuKey">
+    <id column="role_id" jdbcType="INTEGER" property="roleId" />
+    <id column="menu_id" jdbcType="INTEGER" property="menuId" />
+    <id column="id" jdbcType="INTEGER" property="id" />
+  </resultMap>
+  
+  
+  <!-- ........................保存角色: 通过角色ID和菜单ID删除中间表实体  start........................-->  
+  <delete id="deleteRoleAndMenuByRoleIdAndMenuId">
+    delete from role_menu
+    where role_id = #{roleId,jdbcType=INTEGER}
+      and menu_id = #{menuId,jdbcType=INTEGER}
+  </delete>
+<!-- ........................保存角色: 通过角色ID和菜单ID删除中间表实体  end........................--> 
+
+<!-- ........................保存角色: 通过角色ID和菜单ID查询中间表实体信息  start........................-->  
+  <select id="getRoleAndMenuByMenuIdAndRoleId" resultMap="BaseResultMap">
+  	select *
+  	from role_menu
+  	where role_id = #{roleId,jdbcType=INTEGER}
+    and menu_id = #{menuId,jdbcType=INTEGER}
+  </select>
+<!-- ........................保存角色: 通过角色ID和菜单ID查询中间表实体信息  end........................-->
+  
+  <delete id="deleteByPrimaryKey" parameterType="com.inter.pojo.system.RoleAndMenuKey">
+    delete from role_menu
+    where role_id = #{roleId,jdbcType=INTEGER}
+      and menu_id = #{menuId,jdbcType=INTEGER}
+      and id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.inter.pojo.system.RoleAndMenuKey">
+    insert into role_menu (role_id, menu_id, id
+      )
+    values (#{roleId,jdbcType=INTEGER}, #{menuId,jdbcType=INTEGER}, #{id,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.inter.pojo.system.RoleAndMenuKey">
+    insert into role_menu
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="roleId != null">
+        role_id,
+      </if>
+      <if test="menuId != null">
+        menu_id,
+      </if>
+      <if test="id != null">
+        id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="roleId != null">
+        #{roleId,jdbcType=INTEGER},
+      </if>
+      <if test="menuId != null">
+        #{menuId,jdbcType=INTEGER},
+      </if>
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+</mapper>
