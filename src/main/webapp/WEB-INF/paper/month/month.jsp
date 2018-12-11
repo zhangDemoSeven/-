@@ -39,7 +39,7 @@
 		    <button class="layui-btn layui-btn-normal" onclick="seePaper()">查看试卷</button>
 		    <button class="layui-btn layui-btn-warm" onclick="startExam()">开始考试</button>
 		    <button class="layui-btn layui-btn-danger" onclick="endExam()">结束试卷</button>
-		    <!-- 合并 -->
+		    <!-- 合并之后 -->
 		    <button class="layui-btn layui-btn-normal" onclick="postil()">批注考试</button>
 		    <button class="layui-btn layui-btn-normal" onclick="tellPaper()">试卷讲解</button>
 		    <button class="layui-btn layui-btn-normal" onclick="seeScore()">查看成绩</button>
@@ -320,7 +320,7 @@
 					{field: 'classesIds',title: '参考班级',align: "center",
 						templet: function(d){
 							var arr=new Array();
-							arr = d.classesIds.split(',');	//以逗号分隔
+							arr = d.classesIds.split(',');	//以逗号分隔字符串
 							for (var i = 0; i < arr.length; i++) {
 								 arr = arr[i];
 								 $.ajax({
@@ -368,6 +368,12 @@
 				  }
 			}); 
 		}
+<<<<<<< HEAD
+=======
+		
+		
+		
+>>>>>>> branch 'master' of https://github.com/SunJiaWei123/-.git
 	</script>
 </body>
 </html>
