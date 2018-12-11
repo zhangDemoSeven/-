@@ -2,8 +2,40 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.inter.mapper.paper.ExamMapper">
 
+	<resultMap type="com.inter.pojo.paper.Exam" id="baseResultMap">
+		<id column="id" property="id"/>
+		<result column="exam_name" property="examName"/>
+		<result column="user_name" property="userName"/>
+		<result column="status" property="status"/>
+		<result column="types" property="types"/>
+		<result column="showeye" property="showeye"/>
+		<result column="classes_ids" property="classesIds"/>
+		<result column="questiontypes_ids" property="questiontypesIds"/>
+		<result column="stage_id" property="stageId"/>
+		<result column="books_id" property="booksId"/>
+		<result column="chapter_ids" property="chapterIds"/>
+		<result column="start_time" property="startTime"/>
+		<result column="end_time" property="endTime"/>
+		<result column="single_joins" property="singleJoins"/>
+		<result column="mulitple_joins" property="mulitpleJoins"/>
+		<result column="qaa_joins" property="qaaJoins"/>
+		<result column="upper_joins" property="upperJoins"/>
+		<result column="single_number" property="singleNumber"/>
+		<result column="single_fraction" property="singleFraction"/>
+		<result column="mulit_number" property="mulitNumber"/>
+		<result column="mulit_fraction" property="mulitFraction"/>
+		<result column="qaa_number" property="qaaNumber"/>
+		<result column="qaa_fraction" property="qaaFraction"/>
+		<result column="upper_number" property="upperNumber"/>
+		<result column="upper_fraction" property="upperFraction"/>
+		<result column="create_user" property="createUser"/>
+		<result column="create_time" property="createTime"/>
+		<result column="modify_user" property="modifyUser"/>
+		<result column="modify_time" property="modifyTime"/>
+	</resultMap>
+
 	<!-- 获取所有考试信息 -->
-	<select id="getAllExams" resultType="com.inter.pojo.paper.Exam">
+	<select id="getAllExams" resultMap="baseResultMap">
 		select * from exam
 	</select>
 </mapper>
