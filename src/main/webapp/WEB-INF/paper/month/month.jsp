@@ -39,6 +39,7 @@
 		    <button class="layui-btn layui-btn-normal">查看试卷</button>
 		    <button class="layui-btn layui-btn-warm">开始考试</button>
 		    <button class="layui-btn layui-btn-danger">结束试卷</button>
+		    <!-- 合并 -->
 		    <button class="layui-btn layui-btn-normal" onclick="postil()">批注考试</button>
 		    <button class="layui-btn layui-btn-normal">试卷讲解</button>
 		    <button class="layui-btn layui-btn-normal">查看成绩</button>
