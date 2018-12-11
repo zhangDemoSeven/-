@@ -317,7 +317,24 @@
 							if (d.chapterIds == 195 || d.chapterIds == '195') return "项目案例：制作“北大青鸟助学夏令营”主体活动宣传海报";
 						}
 					},
-					{field: 'classesIds',title: '参考班级',align: "center"},
+					{field: 'classesIds',title: '参考班级',align: "center",
+						templet: function(d){
+							var arr=new Array();
+							arr = d.classesIds.split(',');	//以逗号分隔
+							for (var i = 0; i < arr.length; i++) {
+								 arr = arr[i];
+								 $.ajax({
+										url: '${pageContext.request.contextPath}/exam/getClasses',
+										type: "GET",
+										dataType: "JSON",
+										data: {"id": arr},
+										success: function(data) {
+											return data.class_name;
+										}
+								 });
+							}
+						}		
+					},
 					{field: 'startTime',title: '开始时间',align: "center"},
 					{field: 'endTime',title: '结束时间',align: "center"},
 					{field: 'userName',title: '发布人',align: "center"},
@@ -344,15 +361,13 @@
 		
 		//判断试卷状态不能再进行中
 		function postil() {
-				layui.use('layer', function(){
-					  var layer = layui.layer;
-					  if(status = 4){
-					  	layer.msg('该试卷不在批改范围内，不能批注！'); 
-					  }
-					}); 
+			layui.use('layer', function(){
+				  var layer = layui.layer;
+				  if(status = 4){
+				  	layer.msg('该试卷不在批改范围内，不能批注！'); 
+				  }
+			}); 
 		}
-		
-		//
 	</script>
 </body>
 </html>
