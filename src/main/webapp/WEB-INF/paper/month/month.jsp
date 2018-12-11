@@ -39,7 +39,7 @@
 		    <button class="layui-btn layui-btn-normal">查看试卷</button>
 		    <button class="layui-btn layui-btn-warm">开始考试</button>
 		    <button class="layui-btn layui-btn-danger">结束试卷</button>
-		    <button class="layui-btn layui-btn-normal">批注考试</button>
+		    <button class="layui-btn layui-btn-normal" onclick="postil()">批注考试</button>
 		    <button class="layui-btn layui-btn-normal">试卷讲解</button>
 		    <button class="layui-btn layui-btn-normal">查看成绩</button>
 		    <button class="layui-btn layui-btn-warm">查看排名</button>
@@ -85,6 +85,19 @@
 		        ,page: true		//开启分页
 			});
 		});
+		
+		
+		//判断试卷状态不能再进行中
+		function postil() {
+				layui.use('layer', function(){
+					  var layer = layui.layer;
+					  if(status = 4){
+					  	layer.msg('该试卷不在批改范围内，不能批注！'); 
+					  }
+					}); 
+		}
+		
+		//
 	</script>
 </body>
 </html>
