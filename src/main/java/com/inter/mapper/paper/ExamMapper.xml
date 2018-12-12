@@ -47,4 +47,28 @@
 			<if test=""></if>
 		</where>
 	</select>
+	
+	<!-- 查询试卷状态 -->
+	<select id="getPaperStatus" resultMap="baseResultMap">
+		select status from exam
+	</select>
+	
+	<!-- 多条件查询 -->
+	<select id="getExamsByTerm" resultMap="baseResultMap" parameterType="com.inter.pojo.paper.Exam">
+		select * from exam 
+		<where>
+			<if test="stageId > 0">
+				and stage_id = #{stageId}
+			</if>
+			<if test="classesIds != null">
+				and classes_ids like '%${classesIds}%'
+			</if>
+			<if test="status != null">
+				and status = #{status}
+			</if>
+			<if test="examName != null">
+				and exam_name like '%${examName}%'
+			</if>
+		</where>
+	</select>
 </mapper>

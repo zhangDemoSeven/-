@@ -10,40 +10,44 @@
 	<body>
 		<div class="layui-form">  
             <div class="layui-input-inline">  
-                <select name="stage" id="stage" lay-filter="stage">  
+                <select id="stage" lay-filter="stage">  
                     <option value="">请选择阶段</option>
                 </select>  
             </div>  
             <div class="layui-input-inline">  
-                <select name="classes" id="classes" lay-filter="classes" disabled>  
+                <select id="classes" lay-filter="classes" disabled>  
                     <option>请选择参考班级</option>  
                 </select>  
             </div>  
             <div class="layui-input-inline">  
-                <select name="status" id="status" lay-filter="status" disabled>  
+                <select id="status" lay-filter="status" disabled>  
                     <option>请选择试卷状态</option>  
                 </select>  
             </div>  
             <div class="layui-input-inline">  
-                <input type="text" class="layui-input" name="paperName" id="paperName" lay-filter="paperName" placeholder="请输入试卷名称" readonly="readonly"/>
+                <input type="text" class="layui-input" id="paperName" lay-filter="paperName" placeholder="请输入试卷名称" readonly="readonly"/>
             </div>  
             <div class="layui-input-inline"> 
                 <input type="text" class="layui-input" id="createTime" placeholder="请选择时间"/>
             </div>
         </div>  
         <div style="margin-left: 10px;margin-top: 10px;">
-		    <button class="layui-btn" onclick="query()">查询</button>
-		    <button class="layui-btn" onclick="publishPaper()">发布试卷</button>
-		    <button class="layui-btn layui-btn-normal" onclick="seePaper()">查看试卷</button>
-		    <button class="layui-btn layui-btn-warm" onclick="startExam()">开始考试</button>
-		    <button class="layui-btn layui-btn-danger" onclick="endExam()">结束试卷</button>
-		    <!-- 合并之后 -->
-		    <button class="layui-btn layui-btn-normal" onclick="postil()">批注考试</button>
-		    <button class="layui-btn layui-btn-normal" onclick="tellPaper()">试卷讲解</button>
-		    <button class="layui-btn layui-btn-normal" onclick="seeScore()">查看成绩</button>
-		    <button class="layui-btn layui-btn-warm" onclick="seeRank()">查看排名</button>
+		    
 		</div>  
         <table id="examList" class="layui-hide" lay-filter="examList"></table>
+        <script type="text/html" id="toolbar">
+  		<div class="layui-btn-container">
+			<button class="layui-btn layui-btn-sm" lay-event="query">查询</button>
+		    <button class="layui-btn layui-btn-sm" onclick="publishPaper()">发布试卷</button>
+		    <button class="layui-btn layui-btn-sm" onclick="seePaper()">查看试卷</button>
+		    <button class="layui-btn layui-btn-sm" lay-event="startExam">开始考试</button>
+		    <button class="layui-btn layui-btn-sm" onclick="endExam()">结束试卷</button>
+		    <button class="layui-btn layui-btn-sm" onclick="postil()">批注考试</button>
+		    <button class="layui-btn layui-btn-sm" onclick="tellPaper()">试卷讲解</button>
+		    <button class="layui-btn layui-btn-sm" onclick="seeScore()">查看成绩</button>
+		    <button class="layui-btn layui-btn-sm" onclick="seeRank()">查看排名</button>
+  		</div>
+		</script>
 	<script type="text/javascript">
 		$(function() {
 			//三级联动模块
@@ -51,10 +55,11 @@
 				type : "GET",
 				url : "${pageContext.request.contextPath}/stage/getAllStages.do",
 				dataType : "JSON",
+				async : false,
 				success: function(data) {
 					$.each(data,function(i,v){
 						i = i+1;
-						$option = $("<option value='"+i+"'>"+v.name+"</option>");
+						var $option = $("<option value='"+i+"'>"+v.name+"</option>");
 						$("#stage").append($option);
 					});
 					
@@ -75,7 +80,6 @@
 					$("#classes").html("");
 					$("#classes").removeAttr("disabled");	//去除锁定状态
 					var id = $("#stage option:selected").val();
-					alert(id);
 					$.ajax({
 						type : "GET",
 						url : "${pageContext.request.contextPath}/classes/getClassesByStage.do",
@@ -83,9 +87,11 @@
 						dataType : "JSON",
 						async : false,	//同步,否则无法渲染
 						success: function(data) {
+							var $please = $("<option value=''>请选择参考班级</option>");
+							$("#classes").append($please);
 							$.each(data,function(i,v){
 								i = i+1;
-								$option = $("<option value='"+i+"'>"+v.className+"</option>");
+								var $option = $("<option value='"+i+"'>"+v.className+"</option>");
 								$("#classes").append($option);
 							});
 						}
@@ -100,17 +106,21 @@
 				if (data.value != "") {
 					$("#status").removeAttr("disabled");	//去除锁定状态
 					var id = $("#classes option:selected").val();
-					alert(id);
 					$.ajax({
 						type : "GET",
-						url : "${pageContext.request.contextPath}/classes/getClassesByStage.do",
-						data : {"id" : id},
+						url : "${pageContext.request.contextPath}/exam/getPaperStatus.do",
 						dataType : "JSON",
 						async : false,	//同步,否则无法渲染
 						success: function(data) {
+							var $please = $("<option value=''>请选择试卷状态</option>");
+							$("#status").append($please);
 							$.each(data,function(i,v){
-								i = i+1;
-								$option = $("<option value='"+i+"'>"+v.className+"</option>");
+								var nowStatus;
+								if (v.status == "1" || v.status == 1) nowStatus = "未开考";
+								if (v.status == "2" || v.status == 2) nowStatus = "进行中";
+								if (v.status == "3" || v.status == 3) nowStatus = "批改中";
+								if (v.status == "4" || v.status == 4) nowStatus = "已结束";
+								var $option = $("<option value='"+v.status+"'>"+nowStatus+"</option>");
 								$("#status").append($option);
 							});
 						}
@@ -118,6 +128,7 @@
 				}
 				form.render('select'); //重新渲染select框，这个必须要加，否则不起作用
 			});
+			
 			form.on('select(status)', function(data){
 				$("#paperName").text("");
 				//判断是否选择，如果选择去去除下一个的锁定状态
@@ -420,6 +431,33 @@
 		        ,page: true		//开启分页
 			});
 			
+			//监听头部工具栏方法
+			table.on('toolbar(examList)', function(obj){
+			    var checkStatus = table.checkStatus(obj.config.id); //获取选中行状态
+			    switch(obj.event){
+			        case 'startExam':
+				        var data = checkStatus.data;  //获取选中行数据
+				        alert(JSON.stringify(data));
+				        break;		//每个方法执行结束记得跳出
+			        case 'query':
+			        	//获取条件数据
+						var stageId = $("#stage option:selected").val();	//阶段ID
+						var classesIds = $("#classes option:selected").val();	//参考班级ID
+						var status = $("#status option:selected").val();	//试卷状态
+						var examName = $("#paperName").val();				//考试名名称
+						console.log(stageId + "," + classesIds + "," + status + "," + examName);
+						$.ajax({
+							type : "GET",
+							url : "${pageContext.request.contextPath}/exam/getExamsByTerm.do",
+							data : {"stageId" : stageId,"classesIds":classesIds,"status":status,"examName":examName},
+							dataType : "JSON",
+							success: function(data) {
+								alert(JSON.stringify(data));
+							}
+						});
+			        	break;
+			    };
+			});
 		});
 		
 		

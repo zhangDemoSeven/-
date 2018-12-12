@@ -15,5 +15,9 @@ public interface ExamMapper {
 	//获取所有考试信息
 	List<Exam> getAllExams();
 	
-	//根据考试表中的数组查询对应的班级
+	//查询试卷状态
+	List<Exam> getPaperStatus();
+	
+	//多条件查询
+	List<Exam> getExamsByTerm(Exam exam);
 }
